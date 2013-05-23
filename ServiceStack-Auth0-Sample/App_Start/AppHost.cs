@@ -1,24 +1,11 @@
-using System;
-using System.Linq;
-using System.Configuration;
-using System.Collections.Generic;
-using System.Web.Mvc;
-using ServiceStack.Configuration;
 using ServiceStack.CacheAccess;
 using ServiceStack.CacheAccess.Providers;
+using ServiceStack.Configuration;
 using ServiceStack.Mvc;
-using ServiceStack.OrmLite;
-using ServiceStack.OrmLite.SqlServer;
 using ServiceStack.ServiceInterface;
 using ServiceStack.ServiceInterface.Auth;
-using ServiceStack.ServiceInterface.ServiceModel;
 using ServiceStack.WebHost.Endpoints;
-using ServiceStack.ServiceHost;
-using System.Web;
-using System.Text;
-using System.Net;
-using System.IO;
-using ServiceStack.Text;
+using System.Web.Mvc;
 
 [assembly: WebActivator.PreApplicationStartMethod(typeof(ServiceStack_Auth0_Sample.App_Start.AppHost), "Start")]
 

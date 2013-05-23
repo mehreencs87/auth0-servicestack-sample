@@ -1,16 +1,17 @@
 ﻿namespace ServiceStack_Auth0_Sample.App_Start
 {
-    using System;
-    using System.Collections.Generic;
-    using System.IO;
-    using System.Net;
-    using System.Text;
-    using System.Web;
     using ServiceStack.Configuration;
     using ServiceStack.ServiceHost;
     using ServiceStack.ServiceInterface;
     using ServiceStack.ServiceInterface.Auth;
     using ServiceStack.Text;
+    using System;
+    using System.Collections.Generic;
+    using System.IO;
+    using System.Linq;
+    using System.Net;
+    using System.Text;
+    using System.Web;
 
     public class Auth0Provider : OAuthProvider
     {
@@ -132,15 +133,31 @@
                     using (var reader = new StreamReader(tokenResponse.GetResponseStream()))
                     {
                         var obj = JsonObject.Parse(reader.ReadToEnd());
+
+                        //Map all standard attributes if present
                         userSession.Id = obj.Get("user_id");
                         userSession.UserName = obj.Get("nickname");
                         userSession.DisplayName = obj.Get("name");
                         userSession.FirstName = obj.Get("given_name");
                         userSession.LastName = obj.Get("family_name");
                         userSession.Email = obj.Get("email");
-                        var groups = obj.Get<string[]>("groups");
-                        userSession.Roles = new List<string>();
-                        userSession.Roles.AddRange(groups);
+                        userSession.Gender = obj.Get("gender");
+                        
+                        //Map any "groups" to "roles"
+                        if( obj.Keys.Contains("groups") )
+                        {
+                            var groups = obj.Get<string[]>("groups");
+                            userSession.Roles = new List<string>();
+                            userSession.Roles.AddRange(groups);
+                        }
+
+                        //Load picture property which is always present in Auth0 User Profile
+                        var auth0Session = (userSession as Auth0UserSession);
+                        if (auth0Session != null)
+                        {
+                            auth0Session.ExtraData["picture"] = obj.Get("picture");
+                        }
+
                         LoadUserOAuthProvider(userSession, tokens);
                     }
                 }
@@ -154,6 +171,16 @@
 
     public class Auth0UserSession : AuthUserSession
     {
+        public Auth0UserSession()
+        {
+            this.ExtraData = new Dictionary<string, string>();
+        }
+
+        public string Picture 
+        {
+            get { return this.ExtraData["picture"]; } 
+        }
+
         public Dictionary<string, string> ExtraData { get; set; }
     }
 }

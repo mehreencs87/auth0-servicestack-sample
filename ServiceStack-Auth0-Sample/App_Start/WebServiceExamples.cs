@@ -1,17 +1,9 @@
-using System;
-using System.Linq;
-using System.Configuration;
-using System.Collections.Generic;
-using System.Web.Mvc;
-using ServiceStack.Configuration;
-using ServiceStack.CacheAccess;
-using ServiceStack.CacheAccess.Providers;
-using ServiceStack.OrmLite;
-using ServiceStack.OrmLite.SqlServer;
 using ServiceStack.ServiceInterface;
 using ServiceStack.ServiceInterface.Auth;
 using ServiceStack.ServiceInterface.ServiceModel;
-using ServiceStack.WebHost.Endpoints;
+using ServiceStack_Auth0_Sample.App_Start;
+using System.Collections.Generic;
+using System.Linq;
 using System.Text;
 
 namespace ServiceStack_Auth0_Sample
@@ -47,7 +39,9 @@ namespace ServiceStack_Auth0_Sample
             sb.AppendLine("FirstName: " + session.FirstName);
             sb.AppendLine("LastName: " + session.LastName);
             sb.AppendLine("Email: " + session.Email);
-            sb.AppendLine("Groups: " + string.Join(";", session.Roles.ToArray()));
+            if( session.Roles != null )
+                sb.AppendLine("Groups: " + string.Join(";", session.Roles.ToArray()));
+            sb.AppendLine("Picture:" + (session as Auth0UserSession).Picture );
             
             return new HelloResponse { UserInfo = session };
 		}
