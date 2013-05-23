@@ -35,14 +35,11 @@ namespace ServiceStack_Auth0_Sample
             var sb = new StringBuilder();
             sb.AppendLine("Id: " + session.Id);
             sb.AppendLine("DisplayName: " + session.DisplayName);
-            sb.AppendLine("UserName: " + session.UserName);
-            sb.AppendLine("FirstName: " + session.FirstName);
-            sb.AppendLine("LastName: " + session.LastName);
-            sb.AppendLine("Email: " + session.Email);
-            if( session.Roles != null )
-                sb.AppendLine("Groups: " + string.Join(";", session.Roles.ToArray()));
-            sb.AppendLine("Picture:" + (session as Auth0UserSession).Picture );
-            
+
+            var auth0Session = session as Auth0UserSession;
+
+            var pic = auth0Session.ExtraData["picture"];
+
             return new HelloResponse { UserInfo = session };
 		}
 	}

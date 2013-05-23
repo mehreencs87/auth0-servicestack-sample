@@ -151,11 +151,15 @@
                             userSession.Roles.AddRange(groups);
                         }
 
-                        //Load picture property which is always present in Auth0 User Profile
+                        //Load all properties from Auth0 User Profile into the Dictionary
                         var auth0Session = (userSession as Auth0UserSession);
                         if (auth0Session != null)
                         {
-                            auth0Session.ExtraData["picture"] = obj.Get("picture");
+                            //Skip complex proprties: 'identitites' and 'emails'
+                            string[] skipProperties = {"identities", "emails"}; 
+                            
+                            obj.Keys.Where(k => !skipProperties.Contains(k) ).ToList()
+                                        .ForEach( k => auth0Session.ExtraData[k] = obj.Get(k) );
                         }
 
                         LoadUserOAuthProvider(userSession, tokens);
@@ -169,16 +173,14 @@
         }
     }
 
+    /// <summary>
+    /// A simple custom User Session that stores all simple properties 
+    /// </summary>
     public class Auth0UserSession : AuthUserSession
     {
         public Auth0UserSession()
         {
             this.ExtraData = new Dictionary<string, string>();
-        }
-
-        public string Picture 
-        {
-            get { return this.ExtraData["picture"]; } 
         }
 
         public Dictionary<string, string> ExtraData { get; set; }
