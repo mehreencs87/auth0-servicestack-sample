@@ -1,9 +1,8 @@
 namespace ServiceStack_Auth0_Sample.App_Start
 {
-	using ServiceStack.Configuration;
-    using ServiceStack.ServiceHost;
-    using ServiceStack.ServiceInterface;
-    using ServiceStack.ServiceInterface.Auth;
+     using ServiceStack;
+    using ServiceStack.Auth;
+    using ServiceStack.Configuration;
     using ServiceStack.Text;
     using System;
     using System.Collections.Generic;
@@ -12,12 +11,12 @@ namespace ServiceStack_Auth0_Sample.App_Start
     using System.Net;
     using System.Text;
     using System.Web;
-	
+    
     public class Auth0Provider : OAuthProvider
     {
         public const string Name = "auth0";
 
-        public Auth0Provider(IResourceManager appSettings, string realm)
+        public Auth0Provider(IAppSettings appSettings, string realm)
             : base(appSettings, realm, Name)
         {
             this.AuthRealm = realm;
@@ -53,25 +52,27 @@ namespace ServiceStack_Auth0_Sample.App_Start
 
         public string UserInfoUrl { get; set; }
 
-        public override object Authenticate(IServiceBase authService, IAuthSession session, Auth request)
+        public override object Authenticate(IServiceBase authService, IAuthSession session, Authenticate request)
         {
             var tokens = Init(authService, ref session, request);
-            var error = authService.RequestContext.Get<IHttpRequest>().QueryString["error"];
+            var queryString = authService.Request.QueryString;
+
+            var error = queryString["error"];
 
             if (!string.IsNullOrEmpty(error))
             {
-                var error_description = authService.RequestContext.Get<IHttpRequest>().QueryString["error_description"];
+                var error_description = queryString["error_description"];
                 return authService.Redirect(session.ReferrerUrl
                                                     .AddHashParam("error", error)
                                                     .AddHashParam("error_description", error_description));
             }
 
-            var code = authService.RequestContext.Get<IHttpRequest>().QueryString["code"];
+            var code = queryString["code"];
             var isPreAuthCallback = !string.IsNullOrWhiteSpace(code);
 
             if (!isPreAuthCallback)
             {
-                var connection = authService.RequestContext.Get<IHttpRequest>().QueryString["connection"] ?? this.Connection;
+                var connection = queryString["connection"] ?? this.Connection;
                 var preAuthUrl = 
                     this.PreAuthUrl + 
                     string.Format(
@@ -140,7 +141,7 @@ namespace ServiceStack_Auth0_Sample.App_Start
             return authService.Redirect(session.ReferrerUrl.AddHashParam("f", "Unknown"));
         }
 
-        protected override void LoadUserAuthInfo(AuthUserSession userSession, IOAuthTokens tokens, System.Collections.Generic.Dictionary<string, string> authInfo)
+        protected override void LoadUserAuthInfo(AuthUserSession userSession, IAuthTokens tokens, System.Collections.Generic.Dictionary<string, string> authInfo)
         {
             try
             {

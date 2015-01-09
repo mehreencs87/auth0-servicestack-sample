@@ -7,8 +7,21 @@
     <!-- see: https://github.com/AjaxStack/AjaxStack -->
     <script src="jqunback-1.51.min.js"></script>
 
-      <!-- Replace this with your own widget (essentially use your own clientId)-->
-      <script src="https://sdk.auth0.com/auth0.js#client=[YOUR CLIENT ID]&scope=openid"></script>
+      <!-- Replace with your settings-->
+      <script src="https://cdn.auth0.com/js/lock-6.2.min.js"></script>
+      <script type="text/javascript">
+          var lock = new Auth0Lock('{YOUR_CLIENT_ID}', 'https://{YOUR_TENANT}.auth0.com');
+
+          function signin() {
+              lock.show({
+                  callbackURL: 'http://{YOUR_APP_URL}:{YOUR_APP_PORT}/api/auth/auth0'
+                , responseType: 'code'
+                , authParams: {
+                    scope: 'openid profile'
+                }
+              });
+          }
+      </script>
       <script type="text/javascript">
         // An example Backbone application contributed by
         // [Jérôme Gravel-Niquet](http://jgn.me/). This demo uses a simple
@@ -668,8 +681,7 @@ code, pre {
       </div>
       <div class="content">
           <div>
-              <button class="btn" onclick="window.Auth0.signIn({onestep: true})">Log On (using Widget)</button> - or -
-              <button class="btn" onclick="window.location='/api/auth/auth0/?connection=google-oauth2'">Log On (straight with Google)</button>
+              <button class="btn" onclick="window.signin()">Log On (using Lock)</button>
           </div>
         <div id="create-todo">
           <input id="new-todo" placeholder="What needs to be done?" type="text" />

@@ -1,6 +1,6 @@
 namespace ServiceStack_Auth0_Sample.App_Start
 {
-	using ServiceStack.ServiceInterface.Auth;
+	using ServiceStack;
     using System;
     using System.Collections.Generic;
 

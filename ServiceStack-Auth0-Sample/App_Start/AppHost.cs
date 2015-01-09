@@ -1,10 +1,8 @@
-using ServiceStack.CacheAccess;
-using ServiceStack.CacheAccess.Providers;
+using ServiceStack;
+using ServiceStack.Auth;
+using ServiceStack.Caching;
 using ServiceStack.Configuration;
 using ServiceStack.Mvc;
-using ServiceStack.ServiceInterface;
-using ServiceStack.ServiceInterface.Auth;
-using ServiceStack.WebHost.Endpoints;
 using System.Web.Mvc;
 
 [assembly: WebActivator.PreApplicationStartMethod(typeof(ServiceStack_Auth0_Sample.App_Start.AppHost), "Start")]
